@@ -27,10 +27,19 @@ public class CWK2Q2 {
 		// Finding the original index of item
 		int pos = sortedArray.get(hashMapPos).get(item);
 
+		// Returning the position of the item in the original, unsorted array
 		return pos;
 		
 	}
 
+	/**
+	 * Method to perform interpolation search using recursion
+	 * @param sortedArray
+	 * @param item
+	 * @param low
+	 * @param high
+	 * @return Position of the item in the sorted array
+	 */
 	private static int performInterpolationSearch(ArrayList<HashMap<String, Integer>> sortedArray, String item, int low, int high) {
 
 		int pos;
@@ -58,19 +67,8 @@ public class CWK2Q2 {
 
 		}
 
+		// Returning -1 if the item is not found
 		return -1;
-
-	}
-
-	/**
-	 * Method to get the key from the HashMap at a specific index in the ArrayList
-	 * @param array
-	 * @param index
-	 * @return Name (String)
-	 */
-	private static String stringAtIndex(ArrayList<HashMap<String, Integer>> array, int index) {
-
-		return array.get(index).keySet().toArray()[0].toString();
 
 	}
 
@@ -89,16 +87,28 @@ public class CWK2Q2 {
 	private static int posFormula(ArrayList<HashMap<String, Integer>> array, String item, int low, int high) {
 
 		// Using the String compareTo() method
-		// It is comparison based on the unicode value of each character in the strings
-		// compareTo() returns 0 if the strings are equal
-		// It returns < 0 if the the string is less than the other string (and vice versa)
+		// 	- It is comparison based on the unicode value of each character in the strings
+		// 	- compareTo() returns 0 if the strings are equal
+		// 	- It returns < 0 if the the string is less than the other string (and vice versa)
 		return low + ((item.compareTo(stringAtIndex(array, low)) * (high - low))) / (stringAtIndex(array,high).compareTo(stringAtIndex(array,low)));
 
 	}
 
 	/**
+	 * Method to get the key from the HashMap at a specific index in the ArrayList
+	 * @param array
+	 * @param index
+	 * @return Name (String)
+	 */
+	private static String stringAtIndex(ArrayList<HashMap<String, Integer>> array, int index) {
+
+		return array.get(index).keySet().toArray()[0].toString();
+
+	}
+
+	/**
 	 * Utilising code from the previous question to sort the String ArrayList using shell sort
-	 * 	- The only modification was to use the compareTo() method to compare the strings
+	 * 	- The only modification was to use the compareTo() method to compare the strings according to their unicode values
 	 * @param array
 	 * @return The sorted array
 	 */
