@@ -28,10 +28,11 @@
 
 void redact_words(const char *text_filename, const char *redact_words_filename){
     FILE *input, *redact, *result;
+    int i = 0;
 
     printf("---------------------------------------\n");
     printf("Reading from %s\n", text_filename);
-    printf("Reading redact words from %s\n", text_filename);
+    printf("Reading redact words from %s\n", redact_words_filename);
     printf("---------------------------------------\n");
 
 }
