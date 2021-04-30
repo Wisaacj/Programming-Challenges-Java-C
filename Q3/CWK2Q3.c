@@ -21,17 +21,30 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-char** hash_map;  // this is where you should store your names
+char** hash_map;  // This is where you should store your names
+int mapsize;
+float load_factor;
 
 int hash_function(const char *key) {
+
+    printf(key);
+
+    return 0;
 
 }
 
 void resize_map(int new_size) {
 
+    // Resetting the global integer 'mapsize' to the new size
+    mapsize = new_size;
+    // Reallocating the hash_maps's memory to be of the new size
+    *hash_map = (char *) realloc(*hash_map, sizeof(char) * new_size);
+
 }
 
 void add_to_map(const char *name) {
+
+    int hashValue = hash_function(name);
 
 }
 
