@@ -61,6 +61,11 @@ void resize_map(int new_size) {
         return;
     }
 
+    for (int i = map_size; i < new_size; i++) {
+        hash_map[i] = (char*) malloc((30)*sizeof(char)); // Allocating memory for each of the elements
+        hash_map[i] = 0x0;
+    }
+
     // The allocation was successful
     // Resetting the global integer 'map_size' to the new size
     map_size = new_size;
@@ -69,15 +74,15 @@ void resize_map(int new_size) {
 
 void assign_memory_for_bucket(int hash_value, int size_of_bucket) {
 
-    char* temp;
+    char* temp = 0x0;
 
     if (hash_map[hash_value] == 0x0) {
-        temp = (char*) malloc((size_of_bucket + 1) * sizeof(char));
+        temp = (char*) malloc(((size_of_bucket + 1)*sizeof(char)));
     } else {
-        temp = (char*) realloc(hash_map[hash_value], (size_of_bucket + 1) * sizeof(char));
+        temp = (char*) realloc(hash_map[hash_value], ((size_of_bucket + 1)*sizeof(char)));
     }
 
-    if(temp == NULL) {
+    if(temp == 0x0) {
         // Bucket memory allocation failed, cleanup process
         perror("Bucket memory allocation failed, starting cleanup process...");
         free(temp);
@@ -94,7 +99,7 @@ void assign_new_value(int hash_value, const char *name, int forward_check, int o
     assign_memory_for_bucket(hash_value, strlen(name));
 
     // Checking for collisions
-    if (hash_map[hash_value] == NULL || !strcmp(hash_map[hash_value], "")) {
+    if (hash_map[hash_value] == 0x0 || !strcmp(hash_map[hash_value], "")) {
 
         strcpy(hash_map[hash_value], name); // Adding the string to the hash map at the index defined by hash_value
         no_items++; // As an item was successfully added to a bucket, the global integer variable no_items is incremented by one
@@ -141,9 +146,13 @@ void add_to_map(const char *name) {
 
 int remove_from_map(const char *name) {
 
+    return 0;
+
 }
 
 int search_map(const char *name) {
+
+    return 0;
 
 }
 
@@ -151,14 +160,9 @@ void print_map() {
 
     // Looping through all the elements in the hash map
     for (int i = 0; i < map_size; i++) {
-
-        // Checking if the bucket at index i is empty or not
-        if (hash_map[i] != NULL) {
-
+        if (hash_map[i] != 0x0) { // Checking if the bucket at index i is empty or not
             printf("Element in bucket %d is %s", i , hash_map[i]);
-
         }
-
     }
 
 }
