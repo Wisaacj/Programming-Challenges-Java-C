@@ -52,10 +52,8 @@ void resize_map(int new_size) {
 
 }
 
-void add_to_map(const char *name) {
-
-    // Getting the hash value of the string
-    int hash_value = hash_function(name);
+// The parameter 'forward_check' allows for linear probing both 'forwards' and 'backwards' through the array
+void assign_new_value(int hash_value, const char *name, int forward_check) {
 
     // Checking for collisions
     if (hash_map[hash_value] == NULL) {
@@ -63,7 +61,30 @@ void add_to_map(const char *name) {
         hash_map[hash_value] = name; // Adding the string to the hash map at the index defined by hash_value
         no_items++; // As an item was successfully added to a bucket, the global integer variable no_items is incremented by one
 
+    } else {
+
+        // Conditional statement to allow for linear probing both backwards and forwards
+        if (forward_check && ++hash_value < map_size) {
+            forward_check = 0;
+        } else if (!forward_check && --hash_value >= 0) {
+            forward_check = 1;
+        }
+
+        // Using recursion to implement the linear probing
+        return assign_new_value(hash_value, name, forward_check);
+
     }
+
+}
+
+void add_to_map(const char *name) {
+
+    // Getting the hash value of the string
+    int hash_value = hash_function(name);
+
+    // Assigning a new value at the index given by the hash function
+    // Using linear probing with an interval of 1 if there are collisions
+    assign_new_value(hash_value, name, 1);
 
     // Calculating the loading factor
     load_factor = (float) no_items / (float) map_size;
