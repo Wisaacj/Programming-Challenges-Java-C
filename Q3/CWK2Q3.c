@@ -22,7 +22,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-char** hash_map = 0x0;  // This is where you should store your names
+char** hash_map = 0x0; // This is where you should store your names. It is initialised to null
 int map_size = 0; // Used to store the current max size of the hash table
 int no_items = 0; // Used to hold the number of items in the hash table
 float load_factor; // Used to automatically resize the table
