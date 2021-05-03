@@ -19,9 +19,62 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdint.h>
+#include <stdbool.h>
 #include <string.h>
 
-void insert_string(const char* newObj){
+typedef struct linked_list_node {
+    char *name;
+    struct linked_list_node *npx; // npx means the bitwise XOR of the next and previous pointers (address)
+} linked_list_node;
+
+// Defining some global variables to hold the head and tail of the linked list
+linked_list_node *head;
+linked_list_node *tail;
+
+struct linked_list_node *xor_node(char *name) {
+    struct linked_list_node *new;
+    new = (struct linked_list_node *) malloc(sizeof(struct linked_list_node));
+
+    // Checking to see if the memory was successfully allocated
+    if (new == 0x0) {
+        return new;
+    }
+
+    new->name = name;
+    // Initialising the npx address pointer to be null
+    new->npx = 0x0;
+
+    return new;
+}
+
+// Defining a function to calculate the bitwise XOR npx address for the current node
+linked_list_node *calc_xor(linked_list_node *before, linked_list_node *after) {
+
+    return (linked_list_node*) ((uintptr_t) before ^ (uintptr_t) after);
+
+}
+
+void insert_string(const char* newObj) {
+
+    // Using '<' rather than '<=' to account for the fact that strlen() doesn't count the null character
+    if (strlen(newObj) < 64) {
+        struct linked_list_node *new_node = xor_node(newObj); // Creating a new node
+
+        if (head == 0x0) {
+            // Setting the head, tail, and new_node to all have the same pointer when the first node is added to the linked list
+            head = tail = new_node;
+        } else {
+            // Inserting an item at the front of the linked list
+            new_node->npx = calc_xor(0x0, head);
+            head->npx = calc_xor(new_node, calc_xor(0x0, head->npx));
+            head = new_node;
+        }
+
+    } else {
+        perror("Error: String object is too long.\n");
+        perror("Strings should be less than 64 characters in length\n");
+    }
 	
 }
 
