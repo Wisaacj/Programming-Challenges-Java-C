@@ -20,31 +20,46 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 char** hash_map;  // This is where you should store your names
-int mapsize;
+int map_size;
 float load_factor;
 
 int hash_function(const char *key) {
 
-    printf(key);
+    int hash_total = 0;
 
-    return 0;
+    // Looping through each character in the string
+    for (int i = 0; i < strlen(key); i++) {
+
+        // Summing the ASCII values of each character in the string
+        hash_total += key[i];
+
+    }
+
+    // Finding the value of hash_total modulus the size of the underlying data structure
+    int hash_value = hash_total % sizeof(char*);
+
+    return hash_value;
 
 }
 
 void resize_map(int new_size) {
 
-    // Resetting the global integer 'mapsize' to the new size
-    mapsize = new_size;
+    // Resetting the global integer 'map_size' to the new size
+    map_size = new_size;
     // Reallocating the hash_maps's memory to be of the new size
-    *hash_map = (char *) realloc(*hash_map, sizeof(char) * new_size);
+    hash_map = (char**) realloc(hash_map, sizeof(char) * new_size);
 
 }
 
 void add_to_map(const char *name) {
 
-    int hashValue = hash_function(name);
+    // Getting the hash value of the string
+    int hash_value = hash_function(name);
+    // Adding the string to the hash map at the index defined by hash_value
+    hash_map[hash_value] = name;
 
 }
 
