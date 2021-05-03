@@ -22,7 +22,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-char** hash_map;  // This is where you should store your names
+char** hash_map = 0x0;  // This is where you should store your names
 int map_size = 0; // Used to store the current max size of the hash table
 int no_items = 0; // Used to hold the number of items in the hash table
 float load_factor; // Used to automatically resize the table
@@ -45,13 +45,13 @@ int hash_function(const char *key) {
 
 void resize_map(int new_size) {
 
-    if (hash_map == NULL) {
+    if (hash_map == 0x0) {
         hash_map = (char**) malloc(new_size*sizeof(char*)); // Allocating memory for the hash_map
     } else {
         hash_map = (char**) realloc(hash_map, (new_size*sizeof(char*))); // Reallocating the hash_maps's memory to be of the new size
     }
 
-    if (hash_map == NULL) {
+    if (hash_map == 0x0) {
         // Memory allocation failed, cleanup process
         perror("Memory allocation failed, starting cleanup process...");
         for (int i = 0; i < map_size; i++) {
@@ -61,9 +61,11 @@ void resize_map(int new_size) {
         return;
     }
 
-    for (int i = map_size; i < new_size; i++) {
-        hash_map[i] = (char*) malloc((30)*sizeof(char)); // Allocating memory for each of the elements
-        hash_map[i] = 0x0;
+    // Setting each item in the hash_map (that isn't already assigned) to be null
+    if (map_size < new_size) {
+        for (int i = map_size; i < new_size; i++) {
+            hash_map[i] = 0x0;
+        }
     }
 
     // The allocation was successful
@@ -74,38 +76,55 @@ void resize_map(int new_size) {
 
 void assign_memory_for_bucket(int hash_value, int size_of_bucket) {
 
-    char* temp = 0x0;
-
     if (hash_map[hash_value] == 0x0) {
-        temp = (char*) malloc(((size_of_bucket + 1)*sizeof(char)));
+        hash_map[hash_value] = (char*) malloc((size_of_bucket + 1)*sizeof(char));
     } else {
-        temp = (char*) realloc(hash_map[hash_value], ((size_of_bucket + 1)*sizeof(char)));
+        hash_map[hash_value] = (char*) realloc(hash_map[hash_value], (size_of_bucket + 1)*sizeof(char));
     }
 
-    if(temp == 0x0) {
+    if(hash_map[hash_value] == 0x0) {
         // Bucket memory allocation failed, cleanup process
         perror("Bucket memory allocation failed, starting cleanup process...");
-        free(temp);
+        free(hash_map[hash_value]);
     }
 
-    hash_map[hash_value] = temp;
+}
+
+int check_for_duplicate_keys(const char *name) {
+
+    // If the key already exists in the hash map, return 1
+    for (int i = 0; i < map_size; i++) {
+        if (hash_map[i] == name) {
+            return 1;
+        }
+    }
+
+    // The key does not already exist in the hash map
+    return 0;
 
 }
 
 // The parameter 'forward_check' allows for linear probing both 'forwards' and 'backwards' through the array
 void assign_new_value(int hash_value, const char *name, int forward_check, int original_hash_value) {
 
-    // Assigning memory for bucket
-    assign_memory_for_bucket(hash_value, strlen(name));
-
     // Checking for collisions
     if (hash_map[hash_value] == 0x0 || !strcmp(hash_map[hash_value], "")) {
+
+        // Assigning memory for bucket
+        assign_memory_for_bucket(hash_value, strlen(name));
 
         strcpy(hash_map[hash_value], name); // Adding the string to the hash map at the index defined by hash_value
         no_items++; // As an item was successfully added to a bucket, the global integer variable no_items is incremented by one
         printf("Your key: %s has been successfully inserted into the hash table", name);
 
     } else {
+
+        int duplicates = check_for_duplicate_keys(name);
+
+        if (duplicates) {
+            perror("Error: the key you wish to input already exists. Cancelling operation...");
+            return;
+        }
 
         // Conditional statement to allow for linear probing both backwards and forwards
         if (forward_check > 0) {
@@ -160,8 +179,10 @@ void print_map() {
 
     // Looping through all the elements in the hash map
     for (int i = 0; i < map_size; i++) {
-        if (hash_map[i] != 0x0) { // Checking if the bucket at index i is empty or not
+        if (hash_map[i] != NULL) { // Checking if the bucket at index i is empty or not
+
             printf("Element in bucket %d is %s", i , hash_map[i]);
+
         }
     }
 
