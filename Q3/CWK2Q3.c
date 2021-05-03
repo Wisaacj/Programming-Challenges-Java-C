@@ -24,7 +24,8 @@
 
 char** hash_map;  // This is where you should store your names
 int map_size;
-float load_factor;
+int no_items = 0; // Used to hold the number of items in the hash map
+float load_factor; // Used to automatically resize the map
 
 int hash_function(const char *key) {
 
@@ -32,14 +33,11 @@ int hash_function(const char *key) {
 
     // Looping through each character in the string
     for (int i = 0; i < strlen(key); i++) {
-
-        // Summing the ASCII values of each character in the string
-        hash_total += key[i];
-
+        hash_total += key[i]; // Summing the ASCII values of each character in the string
     }
 
     // Finding the value of hash_total modulus the size of the underlying data structure
-    int hash_value = hash_total % sizeof(char*);
+    int hash_value = hash_total % map_size;
 
     return hash_value;
 
@@ -58,8 +56,24 @@ void add_to_map(const char *name) {
 
     // Getting the hash value of the string
     int hash_value = hash_function(name);
-    // Adding the string to the hash map at the index defined by hash_value
-    hash_map[hash_value] = name;
+
+    // Checking for collisions
+    if (hash_map[hash_value] == NULL) {
+
+        hash_map[hash_value] = name; // Adding the string to the hash map at the index defined by hash_value
+        no_items++; // As an item was successfully added to a bucket, the global integer variable no_items is incremented by one
+
+    }
+
+    // Calculating the loading factor
+    load_factor = (float) no_items / (float) map_size;
+
+    // If the loading factor is above 0.7, the hash_map is automatically doubled in size
+    if (load_factor > 0.7) {
+
+        resize_map(2*map_size);
+
+    }
 
 }
 
