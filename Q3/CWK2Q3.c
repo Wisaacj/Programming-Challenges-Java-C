@@ -168,6 +168,10 @@ void add_to_map(const char *name) {
     // If the loading factor is above 0.7, the hash_map is automatically doubled in size
     if (load_factor > 0.7) {
 
+        printf("----------------------------------------------------\n");
+        printf("Hash map has reached a load factor greater than 0.7.\n");
+        printf("Automatically resizing to: %d elements\n", 2*map_size);
+        printf("----------------------------------------------------\n");
         resize_map(2*map_size);
 
     }
@@ -197,12 +201,14 @@ int remove_from_map(const char *name) {
 
 void print_map() {
 
+    printf("----------------------------------------------------\n");
     // Looping through all the elements in the hash map
     for (int i = 0; i < map_size; i++) {
         if (hash_map[i] != 0x0) { // Checking if the bucket at index i is empty or not
             printf("Element in bucket %d is %s\n", i , hash_map[i]);
         }
     }
+    printf("----------------------------------------------------\n");
 
 }
 
