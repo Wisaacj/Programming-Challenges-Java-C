@@ -53,7 +53,7 @@ void resize_map(int new_size) {
 
     if (hash_map == 0x0) {
         // Memory allocation failed, cleanup process
-        perror("Memory allocation failed, starting cleanup process...");
+        perror("Memory allocation failed, starting cleanup process...\n");
         for (int i = 0; i < map_size; i++) {
             free(hash_map[i]);
         }
@@ -84,22 +84,28 @@ void assign_memory_for_bucket(int hash_value, int size_of_bucket) {
 
     if(hash_map[hash_value] == 0x0) {
         // Bucket memory allocation failed, cleanup process
-        perror("Bucket memory allocation failed, starting cleanup process...");
+        perror("Bucket memory allocation failed, starting cleanup process...\n");
         free(hash_map[hash_value]);
     }
 
 }
 
-int check_for_duplicate_keys(const char *name) {
+int search_map(const char *name) {
 
-    // If the key already exists in the hash map, return 1
+    // Searching the map for the element 'name'
     for (int i = 0; i < map_size; i++) {
-        if (hash_map[i] == name) {
+        char *temp = hash_map[i];
+
+        if (temp == 0x0) {
+            temp = "";
+        }
+
+        if (strcmp(temp, name) == 0) {
             return 1;
         }
     }
 
-    // The key does not already exist in the hash map
+    // The element 'name' was not found in the map
     return 0;
 
 }
@@ -115,14 +121,14 @@ void assign_new_value(int hash_value, const char *name, int forward_check, int o
 
         strcpy(hash_map[hash_value], name); // Adding the string to the hash map at the index defined by hash_value
         no_items++; // As an item was successfully added to a bucket, the global integer variable no_items is incremented by one
-        printf("Your key: %s has been successfully inserted into the hash table", name);
+        printf("Your key: %s has been successfully inserted into the hash table\n", name);
 
     } else {
 
-        int duplicates = check_for_duplicate_keys(name);
+        int duplicates = search_map(name);
 
         if (duplicates) {
-            perror("Error: the key you wish to input already exists. Cancelling operation...");
+            perror("Error: the key you wish to input already exists. Cancelling operation...\n");
             return;
         }
 
@@ -133,6 +139,11 @@ void assign_new_value(int hash_value, const char *name, int forward_check, int o
         } else {
             hash_value = (original_hash_value + forward_check) % map_size;
             forward_check = -(forward_check - 1);
+        }
+
+        // Checking for bugs where the hash_value is less than 0 (to stop index errors)
+        if (hash_value < 0) {
+            hash_value += map_size;
         }
 
         // Using recursion to implement the linear probing
@@ -165,11 +176,20 @@ void add_to_map(const char *name) {
 
 int remove_from_map(const char *name) {
 
-    return 0;
+    // Searching the map for the element 'name'
+    for (int i = 0; i < map_size; i++) {
+        char *temp = hash_map[i];
 
-}
+        if (temp == 0x0) {
+            temp = "";
+        }
 
-int search_map(const char *name) {
+        if (strcmp(temp, name) == 0) {
+            hash_map[i] = 0x0; // Resetting the element at index i to be null
+            no_items--; // Decreasing the no_items by one
+            return 1;
+        }
+    }
 
     return 0;
 
@@ -179,10 +199,8 @@ void print_map() {
 
     // Looping through all the elements in the hash map
     for (int i = 0; i < map_size; i++) {
-        if (hash_map[i] != NULL) { // Checking if the bucket at index i is empty or not
-
-            printf("Element in bucket %d is %s", i , hash_map[i]);
-
+        if (hash_map[i] != 0x0) { // Checking if the bucket at index i is empty or not
+            printf("Element in bucket %d is %s\n", i , hash_map[i]);
         }
     }
 
