@@ -345,14 +345,6 @@ int main(int argc, char *argv[]) {
 	insert_after("Bravo", "Delta");
 	insert_before("Alpha", "Echo");
 
-	// My own tests for the edge cases of insertion
-	insert_before("Charlie", "Laurence");
-	insert_after("Alpha", "Laurence bit dick");
-
-	// Checking to see if the function returns false when the string is not in the linked_list
-	int output = insert_before("Nutjob", "Big dick");
-	printf("The result of the previous insertion is: %d\n", output);
-
 	print_list(); // Charlie -> Bravo -> Delta -> Echo -> Alpha
 
     char result[10];
