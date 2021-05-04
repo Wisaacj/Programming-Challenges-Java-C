@@ -182,16 +182,37 @@ int insert_after(const char* after, const char* newObj) {
 
 int remove_string(char* result){
 
-    linked_list_node *curr = head;
-    linked_list_node *prev = 0x0, *next;
-
-    while (strcmp(curr->name, result) != 0) {
-        next = calc_xor(prev, curr->npx);
-        prev = curr;
-        curr = next;
+    // Checking that the head exists
+    if (head == 0x0) {
+        return 0;
     }
 
+    // Getting the name from the head and filling the result buffer with it
+    strcpy(result, head->name);
 
+    // Calculating the address of the item after the head
+    linked_list_node *next_after_head = calc_xor(0x0, head->npx);
+
+    if (next_after_head != 0x0) {
+
+        linked_list_node *next_next = calc_xor(head, next_after_head->npx);
+        // Calculating the new address of the new head
+        next_after_head->npx = calc_xor(0x0, next_next);
+        // Freeing the memory currently occupied by the linked list node to be removed
+        free(head);
+        // Resetting the head to the node now at the first position in the linked list
+        head = next_after_head;
+
+    } else {
+
+        // This is branch is called if the head is the only node in the linked_list
+        free(head);
+        head = 0x0;
+
+    }
+
+    // Returning true after a successful removal
+    return 1;
 	
 }
 
@@ -201,13 +222,50 @@ int remove_after(const char *after, char *result){
     linked_list_node *curr = head;
     linked_list_node *prev = 0x0, *next;
 
-    while (curr != 0x0) {
-        printf("Item: %s\n", curr->name);
+    // Checking to make sure the head is not null
+    if (curr == 0x0) {
+        return 0;
+    }
+
+    while (strcmp(curr->name, after) != 0) {
         next = calc_xor(prev, curr->npx);
         prev = curr;
         curr = next;
+
+        if (curr == 0x0) {
+            return 0; // Returning false if the string 'after' is not in the linked list
+        }
+
     }
-	
+
+    // Calculating the address of the node after curr
+    linked_list_node *removal_node = calc_xor(prev, curr->npx);
+
+    // Checking to see if we have reached the end of the linked list
+    if (removal_node == 0x0) {
+        return 0;
+    }
+
+    // Getting the name from the node and filling the result buffer with it
+    strcpy(result, removal_node->name);
+
+    // Calculating the address of the node after removal_node
+    next = calc_xor(curr, removal_node->npx);
+
+    // If next is not null, update the pointer address 'npx' of next
+    if (next != 0x0) {
+        next->npx = calc_xor(curr, calc_xor(removal_node, next->npx));
+    }
+
+    // Updating the address of curr
+    curr->npx = calc_xor(prev, next);
+
+    // Freeing up the memory previously used by the removal_node
+    free(removal_node);
+
+    // Returning true after a successful removal
+	return 1;
+
 }
 
 
@@ -216,12 +274,49 @@ int remove_before(const char *before, char *result) {
     linked_list_node *curr = head;
     linked_list_node *prev = 0x0, *next;
 
-    while (curr != 0x0) {
-        printf("Item: %s\n", curr->name);
+    // Checking to make sure the head is not null
+    if (curr == 0x0) {
+        return 0;
+    }
+
+    while (strcmp(curr->name, before) != 0) {
         next = calc_xor(prev, curr->npx);
         prev = curr;
         curr = next;
+
+        if (curr == 0x0) {
+            return 0; // Returning false if the string 'before' is not in the linked list
+        }
+
     }
+
+    // Setting the address of the removal_node
+    linked_list_node *removal_node = prev;
+
+    // Checking to see if the removal node exists
+    if (removal_node == 0x0) {
+        return 0;
+    }
+
+    // Getting the name from the node and filling the result buffer with it
+    strcpy(result, removal_node->name);
+
+    // Calculating the address of the node before removal_node
+    prev = calc_xor(curr, removal_node->npx);
+
+    // If prev is not null, update the pointer address 'npx' of prev
+    if (prev != 0x0) {
+        prev->npx = calc_xor(calc_xor(removal_node, prev->npx), curr);
+    }
+
+    // Updating the address of curr
+    curr->npx = calc_xor(prev, calc_xor(removal_node, curr->npx));
+
+    // Freeing up the memory previously used by removal_node
+    free(removal_node);
+
+    // Returning true after a successful removal
+    return 1;
 	
 }
 
@@ -230,17 +325,20 @@ void print_list() {
     linked_list_node *curr = head;
     linked_list_node *prev = 0x0, *next;
 
+    printf("--------------------------\n");
+
     while (curr != 0x0) {
         printf("Item: %s\n", curr->name);
         next = calc_xor(prev, curr->npx);
         prev = curr;
         curr = next;
     }
+
+    printf("--------------------------\n");
 	
 }
 
 int main(int argc, char *argv[]) {
-
 	insert_string("Alpha");
 	insert_string("Bravo");
 	insert_string("Charlie");
@@ -248,7 +346,7 @@ int main(int argc, char *argv[]) {
 	insert_before("Alpha", "Echo");
 
 	// My own tests for the edge cases of insertion
-	insert_before("Charlie", "Laurence <3 Rachel");
+	insert_before("Charlie", "Laurence");
 	insert_after("Alpha", "Laurence bit dick");
 
 	// Checking to see if the function returns false when the string is not in the linked_list
@@ -257,8 +355,8 @@ int main(int argc, char *argv[]) {
 
 	print_list(); // Charlie -> Bravo -> Delta -> Echo -> Alpha
 
-	char result[10];
-	int ret;
+    char result[10];
+    int ret;
 
 	ret = remove_after("Delta",result);
 	if(ret)
