@@ -20,10 +20,65 @@
  *  60 seconds.
 */
 
+import java.util.Calendar;
+import java.util.Date;
+
 public class CWK2Q8 {
 
+	public static int getDayOfMonth(Date iter_date, Calendar new_cal) {
+
+		return new_cal.get(Calendar.DAY_OF_MONTH);
+
+	}
+
+	public static int getDayOfWeek(Date iter_date, Calendar new_cal) {
+
+		return new_cal.get(Calendar.DAY_OF_WEEK);
+
+	}
+
+	public static Date addDays(Date iter_date, int days, Calendar new_cal) {
+
+		new_cal.add(Calendar.DATE, days);
+		return new_cal.getTime();
+
+	}
+
+	public static Date createDate(int year, int month, int day_of_month) {
+
+		Calendar my_calendar = Calendar.getInstance();
+		my_calendar.set(year, month, day_of_month);
+		return my_calendar.getTime();
+
+	}
+
 	public static int howManyTuesdays() {
+
+		int count_tuesdays = 0;
+
+		// Creating general calendar instance
+		Calendar new_cal = Calendar.getInstance();
+
+		// Start date
+		Date iter_date = createDate(1901, 0, 1);
+
+		// Final date
+		Date end_date = createDate(2000, 11, 31);
 		
+		while (iter_date.compareTo(end_date) < 0) {
+
+			new_cal.setTime(iter_date);
+
+			if (getDayOfWeek(iter_date, new_cal) == 3 && getDayOfMonth(iter_date, new_cal) == 1) {
+				count_tuesdays++;
+			}
+
+			iter_date = addDays(iter_date, 7, new_cal);
+
+		}
+
+		return count_tuesdays;
+
 	}
 	
 	public static void main(String[] args) {
