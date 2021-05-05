@@ -43,6 +43,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <math.h>
 
 char *open_input_file(const char*text_filename) {
 
@@ -103,15 +104,62 @@ char *open_input_file(const char*text_filename) {
 
 }
 
+char **form_2d_array(char *all_letters, const char *key) {
+
+    int key_length = strlen(key);
+    int no_rows = ceil(((double) strlen(all_letters) / (double) key_length));
+
+    // Assigning memory for the 2d char array
+    char **char_array = (char**) malloc(sizeof(char*)*no_rows);
+
+    // Assigning memory for each row
+    for (int i = 0; i < no_rows; i++) {
+        // (key_length + 1) is used so that there is space for the null terminator also
+        char_array[i] = (char*) malloc(sizeof(char)*(key_length+1));
+    }
+
+    strcpy(char_array[0], key);
+
+    int count = 0;
+    for (int i = 1; i < no_rows; i++) {
+        for (int j = 0; j < key_length; j++) {
+            if (count >= strlen(all_letters)) {
+                char_array[i][j] = '5';
+            }
+
+            char_array[i][j] = all_letters[count];
+            count++;
+        }
+        // Adding the null terminator to the end of each row
+        char_array[i][key_length] = '\0';
+    }
+
+    return char_array;
+
+}
+
+void print_2d_array(char **array) {
+
+    int count_rows = 0;
+    while (array[count_rows] != 0x0) {
+        printf("Row %d: %s\n", count_rows, array[count_rows]);
+        count_rows++;
+    }
+
+}
+
 void encrypt_columnar(const char *message_filename, const char *key, char **result){
 
     // Getting the data from the input data file
     char *all_letters = open_input_file(message_filename);
 
-    printf("%s\n", all_letters);
+    char **letters_array = form_2d_array(all_letters, key);
+    print_2d_array(letters_array);
 
     // Freeing the memory being used by 'all_letters'
     free(all_letters);
+    // Freeing the memory being used by 'letters_array'
+    free(letters_array);
 
 }
 
