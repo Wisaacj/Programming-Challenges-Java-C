@@ -210,7 +210,7 @@ int *sort_key_alphabetically(const char* key) {
 
 }
 
-char *get_cipher_string(char **array, int no_characters, int key_length, int *sorted_key_index_array) {
+char *get_cipher_string(char **array, int no_characters, int key_length, const int *sorted_key_index_array) {
 
     char *output = (char*) malloc(sizeof(char)*(no_characters+1));
 
@@ -221,8 +221,6 @@ char *get_cipher_string(char **array, int no_characters, int key_length, int *so
             count++;
         }
     }
-
-    printf("Output string: %s\n", output);
 
     return output;
 
@@ -240,6 +238,8 @@ void encrypt_columnar(const char *message_filename, const char *key, char **resu
     int *sorted_key_indexes = sort_key_alphabetically(key);
     // Getting the encrypted string
     char *encrypted_string = get_cipher_string(letters_array, strlen(all_letters), strlen(key), sorted_key_indexes);
+    // Setting result equal to the encrypted string
+    *result = encrypted_string;
 
     // Freeing the memory being used by 'all_letters'
     free(all_letters);
@@ -257,5 +257,17 @@ int main(int argc, char *argv[]) {
 	encrypt_columnar(example_message, example_key, &encrypted_message);
 	printf("Encrypted message = %s\n", encrypted_message);
 	// insert more code here :-)
+
+	// Outputting the encrypted message
+	FILE *output;
+	output = fopen("../output.txt", "w");
+
+	fprintf(output, "%s", encrypted_message);
+	fflush(output);
+	fclose(output);
+
+	// Freeing the memory used by 'encrypted_message'
+	free(encrypted_message);
+
 	return EXIT_SUCCESS;
 }
