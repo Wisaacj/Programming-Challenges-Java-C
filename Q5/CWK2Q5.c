@@ -30,7 +30,6 @@
 
 char** redact_words_file;
 char** input_words_file;
-char** output_file;
 
 int redact_no_lines;
 int input_no_lines;
@@ -284,7 +283,7 @@ int in_redact_words(char *word) {
 
     string_copy(word_copy, word);
 
-    // Removing punctuation from current word
+    // Removing punctuation from current word_copy
     for (int i = 0; i < string_length(word_copy); i++){
         if (is_alpha(word_copy[i]) == 0) {
             removeChar(word_copy, word_copy[i]);
@@ -350,7 +349,7 @@ void parse_input_words() {
 
 /* ~~~~~~~~~~~~ Main Functions ~~~~~~~~~~~~ */
 
-void redact_words(const char *text_filename, const char *redact_words_filename){
+void redact_words(const char *text_filename, const char *redact_words_filename) {
 
     printf("---------------------------------------\n");
     printf("Reading from %s\n", text_filename);
