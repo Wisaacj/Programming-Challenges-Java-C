@@ -45,6 +45,9 @@
 #include <string.h>
 #include <math.h>
 
+// Integer variable to hold the number of rows in the 2d array
+int no_rows;
+
 char *open_input_file(const char*text_filename) {
 
     // Declaring the file pointer
@@ -107,7 +110,7 @@ char *open_input_file(const char*text_filename) {
 char **form_2d_array(char *all_letters, const char *key) {
 
     int key_length = strlen(key);
-    int no_rows = ceil(((double) strlen(all_letters) / (double) key_length));
+    no_rows = ceil(((double) (strlen(all_letters) + key_length) / (double) key_length));
 
     // Assigning memory for the 2d char array
     char **char_array = (char**) malloc(sizeof(char*)*no_rows);
@@ -122,12 +125,16 @@ char **form_2d_array(char *all_letters, const char *key) {
 
     int count = 0;
     for (int i = 1; i < no_rows; i++) {
+        int internal_count = 0; // Resetting internal_count to allow for placeholder values to be inputted into rows which aren't full
         for (int j = 0; j < key_length; j++) {
+            // If there is still space in the 2d array after all the characters from 'all_letters' have been inserted, add placeholder characters
             if (count >= strlen(all_letters)) {
                 char_array[i][j] = '5';
+                continue;
             }
 
             char_array[i][j] = all_letters[count];
+            internal_count++;
             count++;
         }
         // Adding the null terminator to the end of each row
@@ -140,11 +147,67 @@ char **form_2d_array(char *all_letters, const char *key) {
 
 void print_2d_array(char **array) {
 
-    int count_rows = 0;
-    while (array[count_rows] != 0x0) {
-        printf("Row %d: %s\n", count_rows, array[count_rows]);
-        count_rows++;
+    for (int i = 0; i < no_rows; i++) {
+        printf("Count %d: %s\n", i, array[i]);
     }
+
+}
+
+int *sort_key_alphabetically(const char* key) {
+
+    // Defining an array to keep track of how the indexes change whilst the key is being sorted alphabetically
+    int length_of_key = strlen(key);
+    int *index_array = (int*) malloc(sizeof(int)*length_of_key);
+    for (int i = 0; i < length_of_key; i++) {
+        index_array[i] = i;
+    }
+
+    // Defining an array to hold the sorted key
+    char *sorted_key = (char*) malloc(sizeof(char)*length_of_key+1);
+    sorted_key[length_of_key] = '\0';
+
+    /* Bubble sort the characters in 'key' */
+    // Algorithm found on: https://stackoverflow.com/questions/9809839/bubble-sort-a-character-array-in-alphabetic-order-in-c
+    // Initialise the sorted_key array to hold pointers to each element in key
+    for (int i = 0; i < length_of_key; i++) {
+        sorted_key[i] = key[i];
+    }
+
+    char temp_char;
+    int temp_int;
+
+    // Sort the array
+    for (int i = 0; i < length_of_key; i++) {
+        for (int j = 0; j < length_of_key-1; j++) {
+            if (sorted_key[j] > sorted_key[j+1]) {
+                temp_char = sorted_key[j];
+                temp_int = index_array[j];
+
+                sorted_key[j] = sorted_key[j+1];
+                index_array[j] = index_array[j+1];
+
+                sorted_key[j+1] = temp_char;
+                index_array[j+1] = temp_int;
+            }
+        }
+    }
+
+    printf("Sorted key: %s\n", sorted_key);
+
+    // Printing the index array after being sorted
+    for (int i = 0; i < length_of_key; i++) {
+        printf("%d ", index_array[i]);
+    }
+
+    printf("\n");
+
+    return index_array;
+
+}
+
+char *get_cipher_string(char **array, int *sorted_key_index_array) {
+
+    char *output =
 
 }
 
@@ -152,9 +215,14 @@ void encrypt_columnar(const char *message_filename, const char *key, char **resu
 
     // Getting the data from the input data file
     char *all_letters = open_input_file(message_filename);
-
+    // Putting the data in a 2d array format
     char **letters_array = form_2d_array(all_letters, key);
+    // Printing the 2d array
     print_2d_array(letters_array);
+    // Getting the indexes of the characters in the sorted key
+    int *sorted_key_indexes = sort_key_alphabetically(key);
+
+
 
     // Freeing the memory being used by 'all_letters'
     free(all_letters);
