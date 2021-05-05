@@ -63,50 +63,26 @@ char *string_copy(char *destination, const char *source) {
 
 }
 
-int split_string(char *string, char token) {
-
-    static int start_index;
-
-    if (start_index == 0x0) {
-        start_index = 0;
-    }
-
-    for (int i = start_index; i < string_length(string); i++) {
-
-        if (string[i] == token) {
-
-            start_index = i+1;
-            return i;
-
-        }
-
-    }
-
-    return -1;
-
-}
-
 // Function to create a substring of a string and copy it to a destination variable
-char *substring(char *dest, const char *source, int start, int end) {
+char* substring(const char *src, int start, int end)
+{
+    // Get the length of the destination string
+    int len = end - start;
 
-    int i = 0;
-    while (end - i > start) {
+    // Allocate (len + 1) chars for destination (+1 for extra null character)
+    char *dest = (char*)malloc(sizeof(char) * (len + 1));
 
-        // Using pointer arithmetic to copy the characters across one by one
-        *dest = *(source + start);
-
-        // Incrementing the char pointers by one
+    // Extracts characters between start and end index from source string
+    // and copy them into the destination string
+    for (int i = start; i < end && (*(src + i) != '\0'); i++) {
+        *dest = *(src + i);
         dest++;
-        source++;
-
-        i++;
-
     }
 
+    // Null-terminate the destination string
     *dest = '\0';
 
-    return dest;
-
+    return dest - len;
 }
 
 // Function to check whether a character is in the alphabet (i.e. not a punctuation character)
@@ -120,13 +96,9 @@ int is_alpha(char letter) {
 char *to_lower(char *dest, const char*source) {
 
     for (int i = 0; i < string_length(source); i++) {
-
         if (source[i] >= 'A' && source[i] <= 'Z') {
-
             *(dest + i) = source[i] + 32;
-
         }
-
     }
 
     return dest;
@@ -136,6 +108,8 @@ char *to_lower(char *dest, const char*source) {
 // Function to compare two strings
 int string_compare(const char *string1, const char *string2) {
 
+    printf("String upper: %s", string1);
+
     char *string1_lower;
     char *string2_lower;
 
@@ -144,6 +118,8 @@ int string_compare(const char *string1, const char *string2) {
 
     string1_lower = to_lower(string1_lower, string1);
     string2_lower = to_lower(string2_lower, string2);
+
+    printf("String lower: %s", string2);
 
     while (*string1_lower && *string1_lower == *string2_lower) {
         ++string1_lower;
@@ -182,7 +158,7 @@ int open_redact_words(const char *redact_words_filename) {
 
         redact_words_file[redact_no_lines] = (char *) malloc((string_length(buffer) + 1) * sizeof(char));
         string_copy(redact_words_file[redact_no_lines], buffer);
-        printf("Line %d: %s with length %d\n", redact_no_lines, redact_words_file[redact_no_lines], string_length(buffer));
+        // printf("Line %d: %s with length %d\n", redact_no_lines, redact_words_file[redact_no_lines], string_length(buffer));
         redact_no_lines++;
 
         /* Use this section when you want to parse multiple words on each line
@@ -237,7 +213,7 @@ int open_input_file(const char*text_filename) {
 
         input_words_file[input_no_lines] = (char*) malloc((string_length(buffer) + 1)*sizeof(char));
         string_copy(input_words_file[input_no_lines], buffer);
-        printf("Line %d: %s with length %d\n", input_no_lines, input_words_file[input_no_lines], string_length(buffer));
+        // printf("Line %d: %s with length %d\n", input_no_lines, input_words_file[input_no_lines], string_length(buffer));
         input_no_lines++;
 
     }
@@ -257,14 +233,9 @@ int open_input_file(const char*text_filename) {
 int in_redact_words(char *word) {
 
     for (int i = 0; i < redact_no_lines; i++) {
-
-        // Need to convert the words to lower case
         if (string_compare(word, redact_words_file[i]) == 0) {
-
             return 1;
-
         }
-
     }
 
     return 0;
@@ -281,11 +252,16 @@ void parse_input_words() {
 
         for (int j = 0; j < string_length(input_words_file[i]); j++) {
 
-            if (input_words_file[i][j] == ' ' && is_alpha(input_words_file[i][j+1])) {
+            if (input_words_file[i][j] == ' ' /*&& is_alpha(input_words_file[i][j+1])*/) {
 
+                current_word = (char*) malloc(j-index_of_last_word);
 
-                substring(current_word, current_line, index_of_last_word, j-1);
-                printf("Current word: %s", current_word);
+                current_word = substring(current_line, index_of_last_word, j);
+                printf("Current word: %s\n", current_word);
+
+                free(current_word);
+
+                index_of_last_word = j+1;
 
             }
 
