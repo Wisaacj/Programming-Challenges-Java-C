@@ -69,17 +69,16 @@ char* substring(const char *src, int start, int end)
     // Get the length of the destination string
     int len = end - start;
 
-    // Allocate (len + 1) chars for destination (+1 for extra null character)
+    // Allocate (len + 1) chars for destination (including the null character)
     char *dest = (char*)malloc(sizeof(char) * (len + 1));
 
-    // Extracts characters between start and end index from source string
-    // and copy them into the destination string
+    // Extracts characters between start and end index from source string and copy them into the destination string
     for (int i = start; i < end && (*(src + i) != '\0'); i++) {
         *dest = *(src + i);
         dest++;
     }
 
-    // Null-terminate the destination string
+    // Add a null termination to the end of the string
     *dest = '\0';
 
     return dest - len;
@@ -92,13 +91,17 @@ int is_alpha(char letter) {
 
 }
 
-// Function to convert strings to lowercase
-char *to_lower(char *dest, const char*source) {
+// Function to convert strings to lowercase --- Currently not working
+char *to_lower(const char *source) {
 
-    for (int i = 0; i < string_length(source); i++) {
+    char *dest = (char*) malloc(string_length(source+1));
+
+    int i = 0;
+    while (source[i] != '\0') {
         if (source[i] >= 'A' && source[i] <= 'Z') {
-            *(dest + i) = source[i] + 32;
+            *(dest + i) = *(source + i) + 32;
         }
+        i++;
     }
 
     return dest;
@@ -106,27 +109,37 @@ char *to_lower(char *dest, const char*source) {
 }
 
 // Function to compare two strings
-int string_compare(const char *string1, const char *string2) {
+int string_compare(char *string1, char *string2) {
 
-    printf("String upper: %s", string1);
+    /*
+    char *string1_copy= (char*) malloc(string_length(string1)+1);
+    char *string2_copy = (char*) malloc(string_length(string2)+1);
 
-    char *string1_lower;
-    char *string2_lower;
+    char *original_string1_copy_pointer = string1_copy;
+    char *original_string2_copy_pointer = string2_copy;
 
-    string_copy(string1_lower, string1);
-    string_copy(string2_lower, string2);
+    string_copy(string1_copy, string1);
+    string_copy(string2_copy, string2);
+     */
 
-    string1_lower = to_lower(string1_lower, string1);
-    string2_lower = to_lower(string2_lower, string2);
+    while (*string1_copy == *string2_copy) {
+        if (*string1_copy == '\0' || *string2_copy == '\n')
+            break;
 
-    printf("String lower: %s", string2);
-
-    while (*string1_lower && *string1_lower == *string2_lower) {
-        ++string1_lower;
-        ++string2_lower;
+        string1_copy++;
+        string2_copy++;
     }
 
-    return (int) (unsigned char) (*string1_lower) - (int) (unsigned char) (*string2_lower);
+    if (*string1_copy == '\0' && *string2_copy == '\n') {
+        free(original_string1_copy_pointer);
+        free(original_string2_copy_pointer);
+        return 0;
+    }
+    else {
+        free(original_string1_copy_pointer);
+        free(original_string2_copy_pointer);
+        return -1;
+    }
 
 }
 
@@ -244,23 +257,36 @@ int in_redact_words(char *word) {
 
 void parse_input_words() {
 
+    // Looping through all the words in the input words file
     for (int i = 0; i < input_no_lines; i++) {
 
-        char *current_word;
         char *current_line = input_words_file[i];
         int index_of_last_word = 0;
 
+        // Looping through the line
         for (int j = 0; j < string_length(input_words_file[i]); j++) {
 
-            if (input_words_file[i][j] == ' ' /*&& is_alpha(input_words_file[i][j+1])*/) {
+            // Checking to see if the word has ended
+            if (input_words_file[i][j] == ' ' /*|| is_alpha(input_words_file[i][j]) == 0*/) {
 
-                current_word = (char*) malloc(j-index_of_last_word);
+                // Allocating memory for current_word
+                char *current_word = (char*) malloc(j-index_of_last_word);
 
+                // Setting current_word equal the word just detected
                 current_word = substring(current_line, index_of_last_word, j);
-                printf("Current word: %s\n", current_word);
 
+                if (in_redact_words(current_word)) {
+                    // Add to the output file '*'s of length string_length(current_word)
+                    printf("Current word: STARRSSSSSSSSSSSSSSSSS\n");
+                } else {
+                    // Add the original word to the output file
+                    printf("Current word: %s\n", current_word);
+                }
+
+                // Freeing up the memory currently being used by current_word
                 free(current_word);
 
+                // Updating index_of_last_word so that the index is now at the start of the next word
                 index_of_last_word = j+1;
 
             }
