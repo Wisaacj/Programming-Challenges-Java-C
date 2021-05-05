@@ -111,33 +111,18 @@ char *to_lower(const char *source) {
 // Function to compare two strings
 int string_compare(char *string1, char *string2) {
 
-    /*
-    char *string1_copy= (char*) malloc(string_length(string1)+1);
-    char *string2_copy = (char*) malloc(string_length(string2)+1);
-
-    char *original_string1_copy_pointer = string1_copy;
-    char *original_string2_copy_pointer = string2_copy;
-
-    string_copy(string1_copy, string1);
-    string_copy(string2_copy, string2);
-     */
-
-    while (*string1_copy == *string2_copy) {
-        if (*string1_copy == '\0' || *string2_copy == '\n')
+    while (*string1 == *string2) {
+        if (*string1 == '\0' || *string2 == '\n')
             break;
 
-        string1_copy++;
-        string2_copy++;
+        string1++;
+        string2++;
     }
 
-    if (*string1_copy == '\0' && *string2_copy == '\n') {
-        free(original_string1_copy_pointer);
-        free(original_string2_copy_pointer);
+    if (*string1 == '\0' && *string2 == '\n') {
         return 0;
     }
     else {
-        free(original_string1_copy_pointer);
-        free(original_string2_copy_pointer);
         return -1;
     }
 
