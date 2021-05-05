@@ -69,7 +69,7 @@ char* substring(const char *src, int start, int end)
     // Get the length of the destination string
     int len = end - start;
 
-    // Allocate (len + 1) chars for destination (including the null character)
+    // Allocate (len + 1) chars for destination string (including the null character)
     char *dest = (char*)malloc(sizeof(char) * (len + 1));
 
     // Extracts characters between start and end index from source string and copy them into the destination string
@@ -94,7 +94,7 @@ int is_alpha(char letter) {
 // Function to convert strings to lowercase --- Currently not working
 char *to_lower(const char *source) {
 
-    char *dest = (char*) malloc(string_length(source+1));
+    char *dest = (char*) malloc(sizeof(char)*string_length(source+1));
 
     int i = 0;
     while (source[i] != '\0') {
@@ -128,6 +128,23 @@ int string_compare(char *string1, char *string2) {
 
 }
 
+// Function to covert a word to stars
+char *convert_to_stars(char *word) {
+
+    char *output = (char*) malloc(string_length(word+1)*sizeof(char));
+
+    for (int i = 0; i < string_length(word); i++) {
+
+        output[i] = '*';
+
+    }
+
+    output[string_length(word)] = '\0';
+
+    return output;
+
+}
+
 /* ~~~~~~~~~~~~ File Opening Functions ~~~~~~~~~~~~ */
 
 // Function to open the redact words file and output it to an array of strings
@@ -156,25 +173,7 @@ int open_redact_words(const char *redact_words_filename) {
 
         redact_words_file[redact_no_lines] = (char *) malloc((string_length(buffer) + 1) * sizeof(char));
         string_copy(redact_words_file[redact_no_lines], buffer);
-        // printf("Line %d: %s with length %d\n", redact_no_lines, redact_words_file[redact_no_lines], string_length(buffer));
         redact_no_lines++;
-
-        /* Use this section when you want to parse multiple words on each line
-        int start_index = 0;
-
-        for (int i = 0; i < 1024; i++) {
-
-            if (buffer[i] == ' ' && in_alphabet(buffer[i+1]) {
-
-                char *temp_word;
-                substring(temp_word, buffer, start_index, i-1);
-                printf("The current word is: %s\n", temp_word);
-                start_index = i+1;
-
-            }
-
-        }
-        */
 
     }
 
@@ -211,7 +210,6 @@ int open_input_file(const char*text_filename) {
 
         input_words_file[input_no_lines] = (char*) malloc((string_length(buffer) + 1)*sizeof(char));
         string_copy(input_words_file[input_no_lines], buffer);
-        // printf("Line %d: %s with length %d\n", input_no_lines, input_words_file[input_no_lines], string_length(buffer));
         input_no_lines++;
 
     }
@@ -225,7 +223,27 @@ int open_input_file(const char*text_filename) {
 
 }
 
-/* ~~~~~~~~~~~~ Parsing Functions ~~~~~~~~~~~~ */
+/* ~~~~~~~~~~~~ Parsing and File Output Functions ~~~~~~~~~~~~ */
+
+int add_word_to_file(char *word, int line_no) {
+
+    result = fopen("C:\\Users\\Will\\Documents\\GitHub\\PoP-CW2-Programming-Challenges\\Q5\\result.txt", "r+");
+
+    // If the file failed to open, return false
+    if (result == 0x0) {
+        perror("Failed to open file...");
+        return 0;
+    }
+
+    fseek(result, 0, SEEK_END);
+
+    fprintf(result, "%s ", word);
+    fflush(result);
+    fclose(result);
+
+    return 1;
+
+}
 
 // Function to check whether the current word is in the redact words file
 int in_redact_words(char *word) {
@@ -240,6 +258,7 @@ int in_redact_words(char *word) {
 
 }
 
+// Main parsing function
 void parse_input_words() {
 
     // Looping through all the words in the input words file
@@ -247,6 +266,7 @@ void parse_input_words() {
 
         char *current_line = input_words_file[i];
         int index_of_last_word = 0;
+        char *outline = (char*) malloc(sizeof(char)*string_length(current_line));
 
         // Looping through the line
         for (int j = 0; j < string_length(input_words_file[i]); j++) {
@@ -254,18 +274,17 @@ void parse_input_words() {
             // Checking to see if the word has ended
             if (input_words_file[i][j] == ' ' /*|| is_alpha(input_words_file[i][j]) == 0*/) {
 
-                // Allocating memory for current_word
-                char *current_word = (char*) malloc(j-index_of_last_word);
-
                 // Setting current_word equal the word just detected
-                current_word = substring(current_line, index_of_last_word, j);
+                char *current_word = substring(current_line, index_of_last_word, j);
 
                 if (in_redact_words(current_word)) {
-                    // Add to the output file '*'s of length string_length(current_word)
+                    // Add '*'s of length string_length(current_word) to the output file
                     printf("Current word: STARRSSSSSSSSSSSSSSSSS\n");
+                    add_word_to_file(convert_to_stars(current_word), i);
                 } else {
                     // Add the original word to the output file
                     printf("Current word: %s\n", current_word);
+                    add_word_to_file(current_word, i);
                 }
 
                 // Freeing up the memory currently being used by current_word
@@ -277,6 +296,9 @@ void parse_input_words() {
             }
 
         }
+
+        // Add a new line character to the file at the end of the sentence
+        add_word_to_file("\n", i);
 
     }
 
