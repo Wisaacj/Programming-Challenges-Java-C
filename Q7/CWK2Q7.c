@@ -147,6 +147,7 @@ char **form_2d_array(char *all_letters, const char *key) {
 
 void print_2d_array(char **array) {
 
+    // Looping through each row in the array and printing out the corresponding string
     for (int i = 0; i < no_rows; i++) {
         printf("Count %d: %s\n", i, array[i]);
     }
@@ -173,10 +174,11 @@ int *sort_key_alphabetically(const char* key) {
         sorted_key[i] = key[i];
     }
 
+    // Declaring temp variables which will be used during the swaps in bubble sort
     char temp_char;
     int temp_int;
 
-    // Sort the array
+    // Sort the array using bubble sort
     for (int i = 0; i < length_of_key; i++) {
         for (int j = 0; j < length_of_key-1; j++) {
             if (sorted_key[j] > sorted_key[j+1]) {
@@ -201,13 +203,28 @@ int *sort_key_alphabetically(const char* key) {
 
     printf("\n");
 
+    // Freeing the memory used by 'sorted_array'
+    free(sorted_key);
+
     return index_array;
 
 }
 
-char *get_cipher_string(char **array, int *sorted_key_index_array) {
+char *get_cipher_string(char **array, int no_characters, int key_length, int *sorted_key_index_array) {
 
-    char *output =
+    char *output = (char*) malloc(sizeof(char)*(no_characters+1));
+
+    int count = 0;
+    for (int i = 1; i < no_rows; i++) {
+        for (int j = 0; j < key_length; j++) {
+            output[count] = array[i][sorted_key_index_array[j]];
+            count++;
+        }
+    }
+
+    printf("Output string: %s\n", output);
+
+    return output;
 
 }
 
@@ -221,13 +238,15 @@ void encrypt_columnar(const char *message_filename, const char *key, char **resu
     print_2d_array(letters_array);
     // Getting the indexes of the characters in the sorted key
     int *sorted_key_indexes = sort_key_alphabetically(key);
-
-
+    // Getting the encrypted string
+    char *encrypted_string = get_cipher_string(letters_array, strlen(all_letters), strlen(key), sorted_key_indexes);
 
     // Freeing the memory being used by 'all_letters'
     free(all_letters);
     // Freeing the memory being used by 'letters_array'
     free(letters_array);
+    // Freeing the memory being used by 'sorted_key_indexes'
+    free(sorted_key_indexes);
 
 }
 
