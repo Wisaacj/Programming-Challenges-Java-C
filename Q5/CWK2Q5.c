@@ -145,6 +145,18 @@ char *convert_to_stars(char *word) {
 
 }
 
+// Function to remove a character from a string
+void removeChar(char *str, char garbage) {
+
+    char *src, *dst;
+    for (src = dst = str; *src != '\0'; src++) {
+        *dst = *src;
+        if (*dst != garbage) dst++;
+    }
+    *dst = '\0';
+
+}
+
 /* ~~~~~~~~~~~~ File Opening Functions ~~~~~~~~~~~~ */
 
 // Function to open the redact words file and output it to an array of strings
@@ -170,10 +182,30 @@ int open_redact_words(const char *redact_words_filename) {
 
     while(fgets(buffer, 1024, redact)) {
 
+        int index_of_last_word = 0;
 
-        redact_words_file[redact_no_lines] = (char *) malloc((string_length(buffer) + 1) * sizeof(char));
-        string_copy(redact_words_file[redact_no_lines], buffer);
-        redact_no_lines++;
+        // If a line contains multiple redact words, split it into multiple lines
+        for (int i = 0; i < 1024; i++) {
+
+            if (buffer[i] == '\0') {
+                redact_words_file[redact_no_lines] = (char *) malloc((string_length(buffer) + 1) * sizeof(char));
+                string_copy(redact_words_file[redact_no_lines], substring(buffer, index_of_last_word, i));
+                printf("Found new redact word: %s\n", redact_words_file[redact_no_lines]);
+                redact_no_lines++;
+                break;
+            }
+
+            if (buffer[i] == ' ') {
+
+                redact_words_file[redact_no_lines] = (char *) malloc((string_length(buffer) + 1) * sizeof(char));
+                string_copy(redact_words_file[redact_no_lines], substring(buffer, index_of_last_word, i));
+                printf("Found new redact word: %s\n", redact_words_file[redact_no_lines]);
+                redact_no_lines++;
+                index_of_last_word = i+1;
+
+            }
+
+        }
 
     }
 
@@ -248,11 +280,24 @@ int add_word_to_file(char *word, int line_no) {
 // Function to check whether the current word is in the redact words file
 int in_redact_words(char *word) {
 
+    char *word_copy = (char*) malloc(sizeof(char)*(string_length(word)+1));
+
+    string_copy(word_copy, word);
+
+    // Removing punctuation from current word
+    for (int i = 0; i < string_length(word_copy); i++){
+        if (is_alpha(word_copy[i]) == 0) {
+            removeChar(word_copy, word_copy[i]);
+        }
+    }
+
     for (int i = 0; i < redact_no_lines; i++) {
-        if (string_compare(word, redact_words_file[i]) == 0) {
+        if (string_compare(word_copy, redact_words_file[i]) == 0) {
             return 1;
         }
     }
+
+    // free(word_copy);
 
     return 0;
 
@@ -266,20 +311,19 @@ void parse_input_words() {
 
         char *current_line = input_words_file[i];
         int index_of_last_word = 0;
-        char *outline = (char*) malloc(sizeof(char)*string_length(current_line));
 
         // Looping through the line
         for (int j = 0; j < string_length(input_words_file[i]); j++) {
 
             // Checking to see if the word has ended
-            if (input_words_file[i][j] == ' ' /*|| is_alpha(input_words_file[i][j]) == 0*/) {
+            if (input_words_file[i][j] == ' ') {
 
                 // Setting current_word equal the word just detected
                 char *current_word = substring(current_line, index_of_last_word, j);
 
                 if (in_redact_words(current_word)) {
                     // Add '*'s of length string_length(current_word) to the output file
-                    printf("Current word: STARRSSSSSSSSSSSSSSSSS\n");
+                    printf("Current word: STARS\n");
                     add_word_to_file(convert_to_stars(current_word), i);
                 } else {
                     // Add the original word to the output file
