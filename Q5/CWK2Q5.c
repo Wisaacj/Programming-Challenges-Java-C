@@ -37,7 +37,7 @@ int input_no_lines;
 
 FILE *input, *redact, *result;
 
-/* ~~~~~~~~~~~~ String Manipulation Functions ~~~~~~~~~~~~ */
+/* ~~~~~~~~~~~~ String Manipulation and Comparison Functions ~~~~~~~~~~~~ */
 
 // Function to count the number of characters in a string
 int string_length(const char *string) {
@@ -86,11 +86,71 @@ int split_string(char *string, char token) {
 
 }
 
-char *substring(char *input_string, int index) {
+// Function to create a substring of a string and copy it to a destination variable
+char *substring(char *dest, const char *source, int start, int end) {
 
-    char *output[index+1];
+    int i = 0;
+    while (end - i > start) {
 
-    for (int i = 0; i <)
+        // Using pointer arithmetic to copy the characters across one by one
+        *dest = *(source + start);
+
+        // Incrementing the char pointers by one
+        dest++;
+        source++;
+
+        i++;
+
+    }
+
+    *dest = '\0';
+
+    return dest;
+
+}
+
+// Function to check whether a character is in the alphabet (i.e. not a punctuation character)
+int is_alpha(char letter) {
+
+    return ((letter >= 'a' && letter <= 'z') || (letter >= 'A' && letter <= 'Z'));
+
+}
+
+// Function to convert strings to lowercase
+char *to_lower(char *dest, const char*source) {
+
+    for (int i = 0; i < string_length(source); i++) {
+
+        if (source[i] >= 'A' && source[i] <= 'Z') {
+
+            *(dest + i) = source[i] + 32;
+
+        }
+
+    }
+
+    return dest;
+
+}
+
+// Function to compare two strings
+int string_compare(const char *string1, const char *string2) {
+
+    char *string1_lower;
+    char *string2_lower;
+
+    string_copy(string1_lower, string1);
+    string_copy(string2_lower, string2);
+
+    string1_lower = to_lower(string1_lower, string1);
+    string2_lower = to_lower(string2_lower, string2);
+
+    while (*string1_lower && *string1_lower == *string2_lower) {
+        ++string1_lower;
+        ++string2_lower;
+    }
+
+    return (int) (unsigned char) (*string1_lower) - (int) (unsigned char) (*string2_lower);
 
 }
 
@@ -119,16 +179,28 @@ int open_redact_words(const char *redact_words_filename) {
 
     while(fgets(buffer, 1024, redact)) {
 
-        int index;
 
-        while ((index = split_string(buffer, ' ')) > 0) {
+        redact_words_file[redact_no_lines] = (char *) malloc((string_length(buffer) + 1) * sizeof(char));
+        string_copy(redact_words_file[redact_no_lines], buffer);
+        printf("Line %d: %s with length %d\n", redact_no_lines, redact_words_file[redact_no_lines], string_length(buffer));
+        redact_no_lines++;
 
-            redact_words_file[redact_no_lines] = (char*) malloc((index + 1)*sizeof(char));
-            string_copy(redact_words_file[redact_no_lines], buffer);
-            printf("Line %d: %s with length %d\n", redact_no_lines, redact_words_file[redact_no_lines], string_length(buffer));
-            redact_no_lines++;
+        /* Use this section when you want to parse multiple words on each line
+        int start_index = 0;
+
+        for (int i = 0; i < 1024; i++) {
+
+            if (buffer[i] == ' ' && in_alphabet(buffer[i+1]) {
+
+                char *temp_word;
+                substring(temp_word, buffer, start_index, i-1);
+                printf("The current word is: %s\n", temp_word);
+                start_index = i+1;
+
+            }
 
         }
+        */
 
     }
 
@@ -181,9 +253,45 @@ int open_input_file(const char*text_filename) {
 
 /* ~~~~~~~~~~~~ Parsing Functions ~~~~~~~~~~~~ */
 
-void parse_redact_words() {
+// Function to check whether the current word is in the redact words file
+int in_redact_words(char *word) {
+
+    for (int i = 0; i < redact_no_lines; i++) {
+
+        // Need to convert the words to lower case
+        if (string_compare(word, redact_words_file[i]) == 0) {
+
+            return 1;
+
+        }
+
+    }
+
+    return 0;
+
+}
+
+void parse_input_words() {
+
+    for (int i = 0; i < input_no_lines; i++) {
+
+        char *current_word;
+        char *current_line = input_words_file[i];
+        int index_of_last_word = 0;
+
+        for (int j = 0; j < string_length(input_words_file[i]); j++) {
+
+            if (input_words_file[i][j] == ' ' && is_alpha(input_words_file[i][j+1])) {
 
 
+                substring(current_word, current_line, index_of_last_word, j-1);
+                printf("Current word: %s", current_word);
+
+            }
+
+        }
+
+    }
 
 }
 
@@ -198,6 +306,8 @@ void redact_words(const char *text_filename, const char *redact_words_filename){
 
     open_redact_words(redact_words_filename);
     open_input_file(text_filename);
+
+    parse_input_words();
 
 }
 
