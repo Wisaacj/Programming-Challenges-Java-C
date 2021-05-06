@@ -48,9 +48,8 @@ public class CWK2Q8 {
 	}
 
 	// Function to create a date
-	public static Date createDate(int year, int month, int day_of_month) {
+	public static Date createDate(int year, int month, int day_of_month, Calendar my_calendar) {
 
-		Calendar my_calendar = Calendar.getInstance();
 		my_calendar.set(year, month, day_of_month);
 		return my_calendar.getTime();
 
@@ -66,10 +65,10 @@ public class CWK2Q8 {
 		Calendar new_cal = Calendar.getInstance();
 
 		// Start date
-		Date iter_date = createDate(1901, 0, 1);
+		Date iter_date = createDate(1901, 0, 1, new_cal);
 
 		// Final date
-		Date end_date = createDate(2000, 11, 31);
+		Date end_date = createDate(2000, 11, 31, new_cal);
 
 		// Looping until iter_date is greater than (2000, 12, 31)
 		while (iter_date.compareTo(end_date) < 0) {
