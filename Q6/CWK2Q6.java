@@ -46,6 +46,11 @@ import java.util.Arrays;
 
 public class CWK2Q6 {
 
+	/**
+	 * Main method to control the redact process
+	 * @param textFilename
+	 * @param redactWordsFilename
+	 */
 	public static void redactWords(String textFilename, String redactWordsFilename){
 
 		// Opening the two files and appending each line to an ArrayList of strings
@@ -62,6 +67,12 @@ public class CWK2Q6 {
 		
 	}
 
+	/**
+	 * Method to remove all the specified words that need to be redacted from the text file
+	 * @param file
+	 * @param redactFile
+	 * @return An ArrayList of strings with stars in place of the redacted words
+	 */
 	private static ArrayList<String> removeRedactWords(ArrayList<String> file, ArrayList<String> redactFile) {
 
 		ArrayList<String> output = new ArrayList<>();
@@ -95,6 +106,22 @@ public class CWK2Q6 {
 
 			// Adding the line to the output ArrayList
 			output.add(tempString.toString());
+
+		}
+
+		return output;
+
+	}
+
+	private static ArrayList<String> removeNouns(ArrayList<String> file) {
+
+		ArrayList<String> output = new ArrayList<>();
+
+		// Looping through each string in the ArrayList
+		for (String s : file) {
+
+			// Splitting each line into individual words
+			String[]
 
 		}
 
@@ -151,16 +178,8 @@ public class CWK2Q6 {
 	 */
 	private static void printFile(ArrayList<String> file) {
 
-		/*
 		for (String s : file) {
 			System.out.println(s);
-		}
-		*/
-
-		for (int i = 0; i < 500; i++) {
-
-			System.out.println(file.get(i));
-
 		}
 
 	}
