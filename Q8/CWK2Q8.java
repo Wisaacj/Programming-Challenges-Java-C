@@ -25,25 +25,29 @@ import java.util.Date;
 
 public class CWK2Q8 {
 
-	public static int getDayOfMonth(Date iter_date, Calendar new_cal) {
+	// Function to get the day of the month from a given calendar instance
+	public static int getDayOfMonth(Calendar new_cal) {
 
 		return new_cal.get(Calendar.DAY_OF_MONTH);
 
 	}
 
-	public static int getDayOfWeek(Date iter_date, Calendar new_cal) {
+	// Function to get the day of the week from a given calendar instance
+	public static int getDayOfWeek(Calendar new_cal) {
 
 		return new_cal.get(Calendar.DAY_OF_WEEK);
 
 	}
 
-	public static Date addDays(Date iter_date, int days, Calendar new_cal) {
+	// Function to add days to a given calendar instance
+	public static Date addDays(int days, Calendar new_cal) {
 
 		new_cal.add(Calendar.DATE, days);
 		return new_cal.getTime();
 
 	}
 
+	// Function to create a date
 	public static Date createDate(int year, int month, int day_of_month) {
 
 		Calendar my_calendar = Calendar.getInstance();
@@ -52,8 +56,10 @@ public class CWK2Q8 {
 
 	}
 
+	// Main calculation function
 	public static int howManyTuesdays() {
 
+		// Declaring variable for the number of Tuesdays which land on the first day of the month
 		int count_tuesdays = 0;
 
 		// Creating general calendar instance
@@ -64,19 +70,24 @@ public class CWK2Q8 {
 
 		// Final date
 		Date end_date = createDate(2000, 11, 31);
-		
+
+		// Looping until iter_date is greater than (2000, 12, 31)
 		while (iter_date.compareTo(end_date) < 0) {
 
+			// Setting the day of the general calendar instance used in the following comparisons
 			new_cal.setTime(iter_date);
 
-			if (getDayOfWeek(iter_date, new_cal) == 3 && getDayOfMonth(iter_date, new_cal) == 1)
+			// If the date is a Tuesday and the first day of the month, increment 'count_tuesdays'
+			if (getDayOfWeek(new_cal) == 3 && getDayOfMonth(new_cal) == 1)
 
 				count_tuesdays++;
 
-			iter_date = addDays(iter_date, 7, new_cal);
+			// Add 7 days to 'iter_date'
+			iter_date = addDays(7, new_cal);
 
 		}
 
+		// Returning the number of Tuesdays
 		return count_tuesdays;
 
 	}
