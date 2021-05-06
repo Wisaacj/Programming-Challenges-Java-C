@@ -69,9 +69,9 @@ public class CWK2Q8 {
 
 			new_cal.setTime(iter_date);
 
-			if (getDayOfWeek(iter_date, new_cal) == 3 && getDayOfMonth(iter_date, new_cal) == 1) {
+			if (getDayOfWeek(iter_date, new_cal) == 3 && getDayOfMonth(iter_date, new_cal) == 1)
+
 				count_tuesdays++;
-			}
 
 			iter_date = addDays(iter_date, 7, new_cal);
 
@@ -82,7 +82,10 @@ public class CWK2Q8 {
 	}
 	
 	public static void main(String[] args) {
+
 		int result = CWK2Q8.howManyTuesdays();
 		System.out.println("Number of Tuesdays = " + result);
+
 	}
+
 }
