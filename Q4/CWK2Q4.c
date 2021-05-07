@@ -198,15 +198,11 @@ int remove_string(char* result){
         linked_list_node *next_next = calc_xor(head, next_after_head->npx);
         // Calculating the new address of the new head
         next_after_head->npx = calc_xor(0x0, next_next);
-        // Freeing the memory currently occupied by the linked list node to be removed
-        free(head);
         // Resetting the head to the node now at the first position in the linked list
         head = next_after_head;
 
     } else {
 
-        // This is branch is called if the head is the only node in the linked_list
-        free(head);
         head = 0x0;
 
     }
@@ -309,8 +305,14 @@ int remove_before(const char *before, char *result) {
         prev->npx = calc_xor(calc_xor(removal_node, prev->npx), curr);
     }
 
-    // Updating the address of curr
-    curr->npx = calc_xor(prev, calc_xor(removal_node, curr->npx));
+    if (curr != 0x0) {
+        curr->npx = calc_xor(prev, calc_xor(removal_node, curr->npx)); // Updating the address of curr
+    }
+
+    // Updating head if curr is meant to be the new head
+    if (prev == 0x0) {
+        head = curr; // Updating head
+    }
 
     // Freeing up the memory previously used by removal_node
     free(removal_node);
@@ -363,4 +365,5 @@ int main(int argc, char *argv[]) {
 		printf("Removed: %s\n", result);
 		
 	print_list();
+
 }
