@@ -60,10 +60,8 @@ public class CWK2Q6 {
 		textFile = removeRedactWords(textFile, redactFile);
 		// Removing all the proper nouns from the text file
         textFile = removeProperNouns(textFile);
-        // This line is just for debugging
-        printFile(textFile);
 
-        // Output the results of all the parsing to a text file called 'result.txt'
+        // Output the results to a text file called 'result.txt'
         outputFile(textFile);
 
 	}
@@ -114,6 +112,11 @@ public class CWK2Q6 {
 
 	}
 
+	/**
+	 * Method to remove all the proper nouns from a given file
+	 * @param file
+	 * @return An ArrayList of strings with all the proper nouns removed
+	 */
 	private static ArrayList<String> removeProperNouns(ArrayList<String> file) {
 
 		ArrayList<String> output = new ArrayList<>();
@@ -209,14 +212,15 @@ public class CWK2Q6 {
             return false;
         }
 
-	    // Checking if the first character is uppercase and the previous currWord's last character is not a full stop
+	    // Checking if the first character is uppercase and the previous word's last character is not a full stop
 	    if (Character.isUpperCase(currWord.charAt(0)) && !(previousWord.endsWith("."))) {
 
-	        // Checking if the currWord is just one character long (i.e. currWord = "I")
+	        // Checking if currWord is just one character long (i.e. currWord == "I")
             if (currWord.length() == 1) {
                 return false;
             }
 
+            // Checking if any other characters in the word are capitalised
             for (int i = 1; i < currWord.length(); i++) {
 
                 if (Character.isUpperCase(currWord.charAt(i))) {
@@ -350,6 +354,10 @@ public class CWK2Q6 {
 
 	}
 
+	/**
+	 * Method to output a given ArrayList of strings (lines) to a file 'result.txt'
+	 * @param file
+	 */
 	private static void outputFile(ArrayList<String> file) {
 
 	    // Initialising a BufferedWriter variable
