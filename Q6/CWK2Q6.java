@@ -130,7 +130,7 @@ public class CWK2Q6 {
             // Looping through each string in splits
             for (int i = 0; i < splits.length; i++) {
 
-                if (i != 0 && isNoun(splits[i])) {
+                if (i != 0 && isNoun(splits[i], splits[i-1])) {
 
                     // Appending the 'starred' out word with a space after it
                     tempString.append(convertToStars(splits[i])).append(" ");
@@ -173,29 +173,30 @@ public class CWK2Q6 {
 
     /**
      * Method to check whether a word in a sentence is a proper noun
-     * @param word
+     * @param currWord
+     * @param previousWord
      * @return Boolean variable to indicate whether the word is a proper noun or not
      */
-	private static boolean isNoun(String word) {
+	private static boolean isNoun(String currWord, String previousWord) {
 
 	    boolean noun = false;
 
-	    // Checking if word == null
-        if (word.equals("")) {
+	    // Checking if currWord == null
+        if (currWord.equals("")) {
             return false;
         }
 
-	    // Checking if the first character is uppercase and the previous word's last character is not a full stop
-	    if (Character.isUpperCase(word.charAt(0))) {
+	    // Checking if the first character is uppercase and the previous currWord's last character is not a full stop
+	    if (Character.isUpperCase(currWord.charAt(0)) && !(previousWord.endsWith("."))) {
 
-	        // Checking if the word is just one character long (i.e. word = "I")
-            if (word.length() == 1) {
+	        // Checking if the currWord is just one character long (i.e. currWord = "I")
+            if (currWord.length() == 1) {
                 return false;
             }
 
-            for (int i = 1; i < word.length(); i++) {
+            for (int i = 1; i < currWord.length(); i++) {
 
-                if (Character.isUpperCase(word.charAt(i))) {
+                if (Character.isUpperCase(currWord.charAt(i))) {
 
                     return false;
 
@@ -218,6 +219,9 @@ public class CWK2Q6 {
 	 * @return Boolean saying whether or not the word needs to be redacted
 	 */
 	private static boolean redactable(ArrayList<String> redactFile, String word) {
+
+        // Removing all the punctuation from the word
+        word = word.replaceAll("\\p{Punct}", "");
 
 		// Looping through all the words in the redact file
 		for (String redactWord : redactFile) {
