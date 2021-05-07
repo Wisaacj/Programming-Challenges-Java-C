@@ -258,7 +258,7 @@ int open_input_file(const char*text_filename) {
 
 int add_word_to_file(char *word, int line_no) {
 
-    result = fopen("C:\\Users\\Will\\Documents\\GitHub\\PoP-CW2-Programming-Challenges\\Q5\\result.txt", "r+");
+    result = fopen("./result.txt", "r+");
 
     // If the file failed to open, return false
     if (result == 0x0) {
@@ -364,8 +364,8 @@ void redact_words(const char *text_filename, const char *redact_words_filename) 
 }
 
 int main(int argc, char *argv[]) {
-	const char *input_file = "C:\\Users\\Will\\Documents\\GitHub\\PoP-CW2-Programming-Challenges\\Q5\\debate.txt";
-	const char *redact_file = "C:\\Users\\Will\\Documents\\GitHub\\PoP-CW2-Programming-Challenges\\Q5\\redact.txt";
+	const char *input_file = "./debate.txt";
+	const char *redact_file = "./redact.txt";
 	redact_words(input_file, redact_file);
 	return EXIT_SUCCESS;
 }
