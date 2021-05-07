@@ -59,11 +59,12 @@ public class CWK2Q6 {
 
 		// Splitting the lines in the redact file such that each word is on its own line
 		redactFile = splitRedactFile(redactFile);
-
 		// Removing all the 'redact' words from the text file (using the words given in the redact file)
 		textFile = removeRedactWords(textFile, redactFile);
-		// This line is just for debugging
-		printFile(textFile);
+		// Removing all the proper nouns from the text file
+        textFile = removeNouns(textFile);
+        // This line is just for debugging
+        printFile(textFile);
 		
 	}
 
@@ -121,7 +122,30 @@ public class CWK2Q6 {
 		for (String s : file) {
 
 			// Splitting each line into individual words
-			String[]
+			String[] splits = s.split(" ");
+
+			// Using StringBuilder so that we can concatenate the strings
+            StringBuilder tempString = new StringBuilder();
+
+            // Looping through each string in splits
+            for (int i = 0; i < splits.length; i++) {
+
+                if (i != 0 && isNoun(splits[i])) {
+
+                    // Appending the 'starred' out word with a space after it
+                    tempString.append(convertToStars(splits[i])).append(" ");
+
+                } else {
+
+                    // Appending the original word with a space after it
+                    tempString.append(splits[i]).append(" ");
+
+                }
+
+            }
+
+            // Adding the line to the output ArrayList
+            output.add(tempString.toString());
 
 		}
 
@@ -147,13 +171,53 @@ public class CWK2Q6 {
 
 	}
 
+    /**
+     * Method to check whether a word in a sentence is a proper noun
+     * @param word
+     * @return Boolean variable to indicate whether the word is a proper noun or not
+     */
+	private static boolean isNoun(String word) {
+
+	    boolean noun = false;
+
+	    // Checking if word == null
+        if (word.equals("")) {
+            return false;
+        }
+
+	    // Checking if the first character is uppercase and the previous word's last character is not a full stop
+	    if (Character.isUpperCase(word.charAt(0))) {
+
+	        // Checking if the word is just one character long (i.e. word = "I")
+            if (word.length() == 1) {
+                return false;
+            }
+
+            for (int i = 1; i < word.length(); i++) {
+
+                if (Character.isUpperCase(word.charAt(i))) {
+
+                    return false;
+
+                }
+
+            }
+
+            noun = true;
+
+        }
+
+	    return noun;
+
+    }
+
 	/**
 	 * Method to check if the word needs to be redacted (using the redact file as guidlines0
 	 * @param redactFile
 	 * @param word
 	 * @return Boolean saying whether or not the word needs to be redacted
 	 */
-	private static Boolean redactable(ArrayList<String> redactFile, String word) {
+	private static boolean redactable(ArrayList<String> redactFile, String word) {
 
 		// Looping through all the words in the redact file
 		for (String redactWord : redactFile) {
