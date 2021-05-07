@@ -1,7 +1,4 @@
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -62,10 +59,13 @@ public class CWK2Q6 {
 		// Removing all the 'redact' words from the text file (using the words given in the redact file)
 		textFile = removeRedactWords(textFile, redactFile);
 		// Removing all the proper nouns from the text file
-        textFile = removeNouns(textFile);
+        textFile = removeProperNouns(textFile);
         // This line is just for debugging
         printFile(textFile);
-		
+
+        // Output the results of all the parsing to a text file called 'result.txt'
+        outputFile(textFile);
+
 	}
 
 	/**
@@ -114,7 +114,7 @@ public class CWK2Q6 {
 
 	}
 
-	private static ArrayList<String> removeNouns(ArrayList<String> file) {
+	private static ArrayList<String> removeProperNouns(ArrayList<String> file) {
 
 		ArrayList<String> output = new ArrayList<>();
 
@@ -130,9 +130,10 @@ public class CWK2Q6 {
             // Looping through each string in splits
             for (int i = 0; i < splits.length; i++) {
 
+                // Checking if the word is a proper noun
                 if (i != 0 && isNoun(splits[i], splits[i-1])) {
 
-                    // Appending the 'starred' out word with a space after it
+                    // Appending the 'starred' out word with a space after it if the word is a proper noun
                     tempString.append(convertToStars(splits[i])).append(" ");
 
                 } else {
@@ -160,11 +161,33 @@ public class CWK2Q6 {
 	 */
 	private static String convertToStars(String word) {
 
+	    // Integer variable to reduce the number of stars in the output string if there is any punctuation in word
+	    int reduceLength = 0;
+
+	    // Declaring a string variable to hold any punctuation which needs to be appended to the end of output
+        String addPunctuation = "";
+
+	    // Initialising a variable 'punctuation' to contain all the punctuation characters we will look out for
+        String punctuation = ".,:;";
+
 		// Using StringBuilder so that we can concatenate the stars
 		StringBuilder output = new StringBuilder();
 
-		// Looping for the length of the string and appending the corresponding number of "*"s to output
-		output.append("*".repeat(word.length()));
+		// Checking if 'word' contains any punctuation
+		for (int i = 0; i < word.length(); i++) {
+            if (punctuation.contains(word.substring(i, i+1))) {
+                // 'word' contains punctuation
+                // Adding the punctuation to a temp String variable which will be used to append the punctuation to output
+                addPunctuation = word.substring(i, i+1);
+                // Incrementing the reduce length variable
+                reduceLength += 1;
+            }
+        }
+
+		// Appending (word.length() - reduceLength) number of "*"s to output
+		output.append("*".repeat(word.length() - reduceLength));
+		// Appending any punctuation which was previously included in 'word'
+        output.append(addPunctuation);
 
 		// Converting output to a string and returning it
 		return output.toString();
@@ -326,6 +349,48 @@ public class CWK2Q6 {
 		return output;
 
 	}
+
+	private static void outputFile(ArrayList<String> file) {
+
+	    // Initialising a BufferedWriter variable
+	    BufferedWriter bw = null;
+
+	    try {
+
+	        // Instantiating the BufferedWriter
+	        bw = new BufferedWriter(new FileWriter("./result.txt"));
+
+	        // Writing each line in 'file' to './result.txt'
+	        for (String line : file) {
+
+	            bw.write(line);
+	            bw.newLine();
+
+            }
+
+        } catch (IOException e) {
+
+	        e.printStackTrace();
+
+        } finally {
+
+	        try {
+
+	            if (bw != null) {
+
+	                bw.close();
+
+                }
+
+            } catch (IOException e) {
+
+	            e.printStackTrace();
+
+            }
+
+        }
+
+    }
 
 	public static void main(String[] args) {
 		String inputFile = "./warandpeace.txt";
