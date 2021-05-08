@@ -110,7 +110,7 @@ char *open_input_file(const char*text_filename) {
 char **form_2d_array(char *all_letters, const char *key) {
 
     int key_length = strlen(key);
-    no_rows = ceil(((double) (strlen(all_letters) + key_length) / (double) key_length));
+    no_rows = (int) ((double) (strlen(all_letters) + key_length) / (double) key_length) + 1;
 
     // Assigning memory for the 2d char array
     char **char_array = (char**) malloc(sizeof(char*)*no_rows);
@@ -251,7 +251,7 @@ void encrypt_columnar(const char *message_filename, const char *key, char **resu
 }
 
 int main(int argc, char *argv[]) {
-	const char *example_message = "../text.txt";
+	const char *example_message = "./text.txt";
 	const char *example_key = "LOVELACE";
 	char *encrypted_message = NULL;
 	encrypt_columnar(example_message, example_key, &encrypted_message);
@@ -260,14 +260,14 @@ int main(int argc, char *argv[]) {
 
 	// Outputting the encrypted message
 	FILE *output;
-	output = fopen("../output.txt", "w");
+	output = fopen("./output.txt", "w");
 
 	fprintf(output, "%s", encrypted_message);
 	fflush(output);
 	fclose(output);
 
 	// Freeing the memory used by 'encrypted_message'
-	free(encrypted_message);
+	// free(encrypted_message);
 
 	return EXIT_SUCCESS;
 }

@@ -322,11 +322,11 @@ void parse_input_words() {
 
                 if (in_redact_words(current_word)) {
                     // Add '*'s of length string_length(current_word) to the output file
-                    printf("Current word: STARS\n");
+                    // printf("Current word: STARS\n");
                     add_word_to_file(convert_to_stars(current_word), i);
                 } else {
                     // Add the original word to the output file
-                    printf("Current word: %s\n", current_word);
+                    // printf("Current word: %s\n", current_word);
                     add_word_to_file(current_word, i);
                 }
 
